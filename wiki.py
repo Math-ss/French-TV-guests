@@ -11,7 +11,7 @@ to find the good link. All "print" are here to debug.
 
 19/09/2019
 By Mathgique
-All right reserved(it's completly false but I have always dreamed to write that ;)
+All rights reserved(it's completly false but I have always dreamed to write that ;)
 """
 
 import pickle as pck 
@@ -22,15 +22,20 @@ monde = dict()
 poli = dict()
 error = dict()
 url = dict()
-thelist = allName
+thelist = allName[599 : 700]
 
 import requests
 from bs4 import BeautifulSoup
+from lxml import etree
 
 #The creation of a list of tests to find the job
 test = [" Activité principale\n ", "Profession\n", "Activités", "Profession", "Activité", "Qualité", "Activité principale"]
 testbis = dict()
 testbis["Poste\n"] = "Sportif"
+testbis["Poste"] = "Sportif"
+testbis["Équipe\n"] = "Sportif"
+testbis["Équipe actuelle"] = "Sportif"
+testbis["Club actuel\n"] = "Sportif"
 testbis["Position"] = "Sportif"
 testbis["Nage\n"] = "Sportif"
 testbis["Entraîneur\n"] = "Sportif"
@@ -40,6 +45,8 @@ testbis["Langue d’écriture "] = "Ecrivain"
 testbis["Émissions\n"] = "Présentateur"
 testbis[" Genre musical\n "] = "Chanteur"
 testbis["Sport\n"] = "Sportif"
+testbis["Radio\n"] = "Présentateur"
+testbis["Chaîne\n"] = "Présentateur"
 
 #This URL is the default results page of a search in Wikipédia(fr), without the word(s) we want search
 sdebut = "https://fr.wikipedia.org/w/index.php?search="
@@ -47,7 +54,6 @@ sfin = "&title=Spécial%3ARecherche&profile=advanced&fulltext=1&advancedSearch-c
 dec = 0
 
 for name in thelist:
-    
     print(dec)    
     
     #We add the word(s) to the search URL, it's the name of the guest
@@ -92,17 +98,31 @@ for name in thelist:
     
     #If the guest is a politic man, we find his political party and we stock it in an other dictionnary
     part = soup.find_all(name="th", string="Parti politique\n")
+
+    if(part == []):
+      part = soup.find_all(name="span", string="Parti politique")
+
+    if(part == []):
+      part = soup.find_all(name="span", string="Groupe politique\n")
+    
     if(part != []):
         w = part[0]
         h = w.find_next(name="td")
         lname = h.find_all(name="a")
         aucun = False
+        print("POLITIQUE !!!")
         monde[name[0]].append("Politique")
         d =  dict()
         for c in lname:
+            if(c.string == None):
+              break
+            print(c.string)
             x = c.find_next(name="small")
-            if(x != None):
-                d[c.string] = x.string
+            if(x != None and x.string != None):
+              print(x.string)
+              d[c.string] = x.string
+            else:
+              d[c.string] = "Maybe all his(er) life"
         poli[name[0]] = d
                 
             
